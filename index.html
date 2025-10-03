@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obstacle Dodge Game</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <style>
+    body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script>
+let player;
+let obstacles = [];
+let score = 0;
+let playerImg, obstacleImgs = [];
+
+function preload() {
+  // Tải hình ảnh từ GitHub (thay tên-người-dùng và tên-repo bằng giá trị thực tế)
+  playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/player.png');
+  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc.png'));
+  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc2.png'));
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  player = new Player();
+}
+
+function draw() {
+  background(0);
+  
+  // Cập nhật và hiển thị người chơi
+  player.update();
+  player.show();
+  
+  // Tạo chướng ngại vật mới
+  if (frameCount % 60 === 0) {
+    obstacles.push(new Obstacle());
+  }
+  
+  // Cập nhật và hiển thị chướng ngại vật
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    obstacles[i].update();
+    obstacles[i].show();
+    
+    // Kiểm tra va chạm
+    if (obstacles[i].hits(player)) {
+      noLoop();
+      textSize(32);
+      fill(255, 0, 0);
+      textAlign(CENTER);
+      text('Game Over! Score: ' + score, width / 2, height / 2);
+    }
+    
+    // Xóa chướng ngại vật ra khỏi màn hình
+    if (obstacles[i].offscreen()) {
+      obstacles.splice(i, 1);
+      score += 1;
+    }
+  }
+  
+  // Hiển thị điểm
+  textSize(20);
+  fill(255);
+  textAlign(LEFT);
+  text('Score: ' + score, 10, 30);
+}
+
+function touchMoved() {
+  player.move(mouseX);
+  return false;
+}
+
+class Player {
+  constructor() {
+    this.size = 50;
+    this.x = width / 2;
+    this.y = height - this.size * 2;
+  }
+  
+  update() {
+    this.x = constrain(this.x, 0, width - this.size);
+  }
+  
+  move(targetX) {
+    this.x = targetX;
+  }
+  
+  show() {
+    image(playerImg, this.x, this.y, this.size, this.size);
+  }
+}
+
+class Obstacle {
+  constructor() {
+    this.size = 50;
+    this.x = random(0, width - this.size);
+    this.y = -this.size;
+    this.speed = 5;
+    // Chọn ngẫu nhiên một hình ảnh từ danh sách
+    this.img = random(obstacleImgs);
+  }
+  
+  update() {
+    this.y += this.speed;
+  }
+  
+  show() {
+    image(this.img, this.x, this.y, this.size, this.size);
+  }
+  
+  offscreen() {
+    return this.y > height;
+  }
+  
+  hits(player) {
+    let d = dist(this.x + this.size / 2, this.y + this.size / 2, 
+                 player.x + player.size / 2, player.y + player.size / 2);
+    return d < this.size / 2 + player.size / 2;
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
