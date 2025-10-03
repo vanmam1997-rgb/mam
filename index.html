@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bình Ăn Cả </title>
+  <title> Bình Ăn Cả </title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
   <style>
     body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }
@@ -20,9 +20,9 @@ let globalSpeed = 5; // Tốc độ cơ bản ban đầu
 let gameState = 'menu'; // Trạng thái game: 'menu', 'playing', 'gameover'
 
 function preload() {
-  playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/player.PNG');
-  npcImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc.PNG'); // Bad: thua
-  npc2Img = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc2.PNG'); // Good: +điểm
+  playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/mam/main/img/player.PNG');
+  npcImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/mam/main/img/npc.PNG'); // Good: +điểm
+  npc2Img = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/mam/main/img/npc2.PNG'); // Bad: thua
 }
 
 function setup() {
@@ -37,7 +37,7 @@ function draw() {
     drawMenu();
   } else if (gameState === 'playing') {
     // Tăng tốc độ nhanh hơn
-    globalSpeed += 0.02;
+    globalSpeed += 0.05;
     
     player.update();
     player.show();
@@ -84,11 +84,18 @@ function drawMenu() {
   textSize(32);
   fill(255);
   textAlign(CENTER);
-  text('Luật chơi:', width / 2, height / 2 - 100);
+  text('Luật chơi:', width / 2, height / 2 - 150);
   textSize(20);
-  text('Điều khiển nhân vật di chuyển ngang bằng cách chạm hoặc kéo.', width / 2, height / 2 - 60);
-  text('Ăn npc2 (hình ảnh tốt) để tăng điểm.', width / 2, height / 2 - 30);
-  text('Tránh hoặc ăn npc (hình ảnh xấu) sẽ thua.', width / 2, height / 2);
+  text('Điều khiển nhân vật di chuyển ngang bằng cách chạm hoặc kéo.', width / 2, height / 2 - 100);
+  
+  // Hiển thị hình ảnh npc.PNG (+điểm)
+  image(npcImg, width / 2 - 80, height / 2 - 70, 50, 50);
+  text('Ăn: +1 điểm', width / 2 + 20, height / 2 - 45);
+  
+  // Hiển thị hình ảnh npc2.PNG (thua)
+  image(npc2Img, width / 2 - 80, height / 2 - 20, 50, 50);
+  text('Ăn: Thua', width / 2 + 20, height / 2 + 5);
+  
   textSize(32);
   fill(0, 255, 0);
   text('Start', width / 2, height / 2 + 100);
@@ -141,7 +148,7 @@ class Obstacle {
     this.y = -this.size;
     this.speed = globalSpeed;
     this.type = random() < 0.5 ? 'bad' : 'good'; // 50% bad, 50% good
-    this.img = this.type === 'bad' ? npcImg : npc2Img;
+    this.img = this.type === 'bad' ? npc2Img : npcImg;
   }
   
   update() {
