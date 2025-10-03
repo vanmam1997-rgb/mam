@@ -18,10 +18,9 @@ let score = 0;
 let playerImg, obstacleImgs = [];
 
 function preload() {
-  // Tải hình ảnh từ GitHub (thay tên-người-dùng và tên-repo bằng giá trị thực tế)
-  playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/player.png');
-  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc.png'));
-  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc2.png'));
+  playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/master/img/player.PNG');
+  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/master/img/npc.PNG'));
+  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/master/img/npc2.PNG'));
 }
 
 function setup() {
@@ -32,21 +31,17 @@ function setup() {
 function draw() {
   background(0);
   
-  // Cập nhật và hiển thị người chơi
   player.update();
   player.show();
   
-  // Tạo chướng ngại vật mới
   if (frameCount % 60 === 0) {
     obstacles.push(new Obstacle());
   }
   
-  // Cập nhật và hiển thị chướng ngại vật
   for (let i = obstacles.length - 1; i >= 0; i--) {
     obstacles[i].update();
     obstacles[i].show();
     
-    // Kiểm tra va chạm
     if (obstacles[i].hits(player)) {
       noLoop();
       textSize(32);
@@ -55,14 +50,12 @@ function draw() {
       text('Game Over! Score: ' + score, width / 2, height / 2);
     }
     
-    // Xóa chướng ngại vật ra khỏi màn hình
     if (obstacles[i].offscreen()) {
       obstacles.splice(i, 1);
       score += 1;
     }
   }
   
-  // Hiển thị điểm
   textSize(20);
   fill(255);
   textAlign(LEFT);
@@ -100,7 +93,6 @@ class Obstacle {
     this.x = random(0, width - this.size);
     this.y = -this.size;
     this.speed = 5;
-    // Chọn ngẫu nhiên một hình ảnh từ danh sách
     this.img = random(obstacleImgs);
   }
   
