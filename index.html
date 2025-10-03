@@ -41,8 +41,11 @@ function draw() {
     player.update();
     player.show();
     
-    if (frameCount % 40 === 0) {
-      obstacles.push(new Obstacle());
+    // Sinh nhiều chướng ngại vật hơn, thường xuyên hơn
+    if (frameCount % 10 === 0) {
+      for (let i = 0; i < 3; i++) { // Sinh 3 chướng ngại vật mỗi lần
+        obstacles.push(new Obstacle());
+      }
     }
     
     for (let i = obstacles.length - 1; i >= 0; i--) {
@@ -135,10 +138,9 @@ class Player {
 
 class Obstacle {
   constructor() {
-    this.width = width * 0.9; // 90% chiều rộng màn hình
-    this.height = height * 0.9; // 90% chiều cao màn hình
-    this.x = (width - this.width) / 2; // Căn giữa ngang
-    this.y = -this.height; // Bắt đầu từ trên cùng
+    this.size = 60;
+    this.x = random(0, width - this.size); // Phạm vi toàn màn hình
+    this.y = -this.size;
     this.speed = globalSpeed;
     this.type = random() < 0.5 ? 'bad' : 'good'; // 50% bad, 50% good
     this.img = this.type === 'bad' ? npc2Img : npcImg;
@@ -149,7 +151,7 @@ class Obstacle {
   }
   
   show() {
-    image(this.img, this.x, this.y, this.width, this.height);
+    image(this.img, this.x, this.y, this.size, this.size);
   }
   
   offscreen() {
@@ -157,11 +159,9 @@ class Obstacle {
   }
   
   hits(player) {
-    // Kiểm tra va chạm hình chữ nhật
-    return (player.x + player.size > this.x &&
-            player.x < this.x + this.width &&
-            player.y + player.size > this.y &&
-            player.y < this.y + this.height);
+    let d = dist(this.x + this.size / 2, this.y + this.size / 2, 
+                 player.x + player.size / 2, player.y + player.size / 2);
+    return d < this.size / 2 + player.size / 2;
   }
 }
 
