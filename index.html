@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Obstacle Dodge Game</title>
+  <title> Bình Cân Hết </title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
   <style>
     body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }
@@ -19,9 +19,9 @@ let playerImg, obstacleImgs = [];
 let globalSpeed = 5; // Tốc độ cơ bản ban đầu
 
 function preload() {
-  playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/maain/img/player.PNG');
+  playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/player.PNG');
   obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc.PNG'));
-  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/maain/img/npc2.PNG'));
+  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc2.PNG'));
 }
 
 function setup() {
@@ -32,13 +32,14 @@ function setup() {
 function draw() {
   background(0);
   
-  // Tăng tốc độ dần dần
-  globalSpeed += 0.1; // Tăng 0.01 mỗi frame
+  // Tăng tốc độ nhanh hơn
+  globalSpeed += 0.05; // Tăng 0.05 mỗi frame (khó hơn)
   
   player.update();
   player.show();
   
-  if (frameCount % 60 === 0) {
+  // Chướng ngại vật xuất hiện thường xuyên hơn
+  if (frameCount % 40 === 0) {
     obstacles.push(new Obstacle());
   }
   
@@ -93,10 +94,10 @@ class Player {
 
 class Obstacle {
   constructor() {
-    this.size = 50;
-    this.x = random(0, width - this.size);
+    this.size = 60; // Tăng kích thước chướng ngại vật
+    this.x = random(width * 0.2, width * 0.8 - this.size); // Thu hẹp phạm vi xuất hiện
     this.y = -this.size;
-    this.speed = globalSpeed; // Sử dụng tốc độ toàn cục
+    this.speed = globalSpeed;
     this.img = random(obstacleImgs);
   }
   
