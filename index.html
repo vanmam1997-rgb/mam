@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Bình Cân Hết </title>
+  <title>Bình Ăn Cả </title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
   <style>
     body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }
@@ -15,13 +15,14 @@
 let player;
 let obstacles = [];
 let score = 0;
-let playerImg, obstacleImgs = [];
+let playerImg, npcImg, npc2Img;
 let globalSpeed = 5; // Tốc độ cơ bản ban đầu
+let gameState = 'menu'; // Trạng thái game: 'menu', 'playing', 'gameover'
 
 function preload() {
   playerImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/player.PNG');
-  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc.PNG'));
-  obstacleImgs.push(loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc2.PNG'));
+  npcImg = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc.PNG'); // Bad: thua
+  npc2Img = loadImage('https://raw.githubusercontent.com/vanmam1997-rgb/code/main/img/npc2.PNG'); // Good: +điểm
 }
 
 function setup() {
@@ -32,43 +33,84 @@ function setup() {
 function draw() {
   background(0);
   
-  // Tăng tốc độ nhanh hơn
-  globalSpeed += 0.05; // Tăng 0.05 mỗi frame (khó hơn)
-  
-  player.update();
-  player.show();
-  
-  // Chướng ngại vật xuất hiện thường xuyên hơn
-  if (frameCount % 40 === 0) {
-    obstacles.push(new Obstacle());
-  }
-  
-  for (let i = obstacles.length - 1; i >= 0; i--) {
-    obstacles[i].update();
-    obstacles[i].show();
+  if (gameState === 'menu') {
+    drawMenu();
+  } else if (gameState === 'playing') {
+    // Tăng tốc độ nhanh hơn
+    globalSpeed += 0.02;
     
-    if (obstacles[i].hits(player)) {
-      noLoop();
-      textSize(32);
-      fill(255, 0, 0);
-      textAlign(CENTER);
-      text('Game Over! Score: ' + score, width / 2, height / 2);
+    player.update();
+    player.show();
+    
+    // Chướng ngại vật xuất hiện thường xuyên hơn
+    if (frameCount % 40 === 0) {
+      obstacles.push(new Obstacle());
     }
     
-    if (obstacles[i].offscreen()) {
-      obstacles.splice(i, 1);
-      score += 1;
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+      obstacles[i].update();
+      obstacles[i].show();
+      
+      // Kiểm tra va chạm
+      if (obstacles[i].hits(player)) {
+        if (obstacles[i].type === 'bad') {
+          gameState = 'gameover';
+        } else {
+          score += 1;
+          obstacles.splice(i, 1);
+        }
+      }
+      
+      // Xóa chướng ngại vật ra khỏi màn hình
+      if (obstacles[i] && obstacles[i].offscreen()) {
+        obstacles.splice(i, 1);
+      }
     }
+    
+    // Hiển thị điểm
+    textSize(20);
+    fill(255);
+    textAlign(LEFT);
+    text('Score: ' + score, 10, 30);
+  } else if (gameState === 'gameover') {
+    textSize(32);
+    fill(255, 0, 0);
+    textAlign(CENTER);
+    text('Game Over! Score: ' + score, width / 2, height / 2);
   }
-  
-  textSize(20);
+}
+
+function drawMenu() {
+  textSize(32);
   fill(255);
-  textAlign(LEFT);
-  text('Score: ' + score, 10, 30);
+  textAlign(CENTER);
+  text('Luật chơi:', width / 2, height / 2 - 100);
+  textSize(20);
+  text('Điều khiển nhân vật di chuyển ngang bằng cách chạm hoặc kéo.', width / 2, height / 2 - 60);
+  text('Ăn npc2 (hình ảnh tốt) để tăng điểm.', width / 2, height / 2 - 30);
+  text('Tránh hoặc ăn npc (hình ảnh xấu) sẽ thua.', width / 2, height / 2);
+  textSize(32);
+  fill(0, 255, 0);
+  text('Start', width / 2, height / 2 + 100);
+}
+
+function mousePressed() {
+  if (gameState === 'menu') {
+    // Kiểm tra click vào nút Start
+    if (mouseX > width / 2 - 50 && mouseX < width / 2 + 50 &&
+        mouseY > height / 2 + 70 && mouseY < height / 2 + 130) {
+      gameState = 'playing';
+      score = 0;
+      globalSpeed = 5;
+      obstacles = [];
+    }
+  }
 }
 
 function touchMoved() {
-  player.move(mouseX);
+  if (gameState === 'playing') {
+    player.move(mouseX);
+  }
   return false;
 }
 
@@ -94,11 +136,12 @@ class Player {
 
 class Obstacle {
   constructor() {
-    this.size = 60; // Tăng kích thước chướng ngại vật
-    this.x = random(width * 0.2, width * 0.8 - this.size); // Thu hẹp phạm vi xuất hiện
+    this.size = 60;
+    this.x = random(width * 0.2, width * 0.8 - this.size);
     this.y = -this.size;
     this.speed = globalSpeed;
-    this.img = random(obstacleImgs);
+    this.type = random() < 0.5 ? 'bad' : 'good'; // 50% bad, 50% good
+    this.img = this.type === 'bad' ? npcImg : npc2Img;
   }
   
   update() {
