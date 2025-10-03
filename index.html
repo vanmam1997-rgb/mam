@@ -42,8 +42,8 @@ function draw() {
     player.show();
     
     // Sinh nhiều chướng ngại vật hơn, thường xuyên hơn
-    if (frameCount % 10 === 0) {
-      for (let i = 0; i < 3; i++) { // Sinh 3 chướng ngại vật mỗi lần
+    if (frameCount % 30 === 0) {
+      for (let i = 0; i < 2; i++) { // Sinh 3 chướng ngại vật mỗi lần
         obstacles.push(new Obstacle());
       }
     }
