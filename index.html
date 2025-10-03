@@ -36,13 +36,11 @@ function draw() {
   if (gameState === 'menu') {
     drawMenu();
   } else if (gameState === 'playing') {
-    // Tăng tốc độ nhanh hơn
     globalSpeed += 0.00000001;
     
     player.update();
     player.show();
     
-    // Chướng ngại vật xuất hiện thường xuyên hơn
     if (frameCount % 40 === 0) {
       obstacles.push(new Obstacle());
     }
@@ -51,7 +49,6 @@ function draw() {
       obstacles[i].update();
       obstacles[i].show();
       
-      // Kiểm tra va chạm
       if (obstacles[i].hits(player)) {
         if (obstacles[i].type === 'bad') {
           gameState = 'gameover';
@@ -61,13 +58,11 @@ function draw() {
         }
       }
       
-      // Xóa chướng ngại vật ra khỏi màn hình
       if (obstacles[i] && obstacles[i].offscreen()) {
         obstacles.splice(i, 1);
       }
     }
     
-    // Hiển thị điểm
     textSize(20);
     fill(255);
     textAlign(LEFT);
@@ -88,11 +83,9 @@ function drawMenu() {
   textSize(20);
   text('Điều khiển nhân vật di chuyển ngang bằng cách chạm hoặc kéo.', width / 2, height / 2 - 100);
   
-  // Hiển thị hình ảnh npc2.PNG (+điểm)
   image(npcImg, width / 2 - 80, height / 2 - 70, 50, 50);
   text('Ăn: +1 điểm', width / 2 + 20, height / 2 - 45);
   
-  // Hiển thị hình ảnh npc.PNG (thua)
   image(npc2Img, width / 2 - 80, height / 2 - 20, 50, 50);
   text('Ăn: Thua', width / 2 + 20, height / 2 + 5);
   
@@ -103,7 +96,6 @@ function drawMenu() {
 
 function mousePressed() {
   if (gameState === 'menu') {
-    // Kiểm tra click vào nút Start
     if (mouseX > width / 2 - 50 && mouseX < width / 2 + 50 &&
         mouseY > height / 2 + 70 && mouseY < height / 2 + 130) {
       gameState = 'playing';
@@ -143,9 +135,10 @@ class Player {
 
 class Obstacle {
   constructor() {
-    this.size = 60;
-    this.x = random(width * 0.2, width * 0.8 - this.size);
-    this.y = -this.size;
+    this.width = width * 0.9; // 90% chiều rộng màn hình
+    this.height = height * 0.9; // 90% chiều cao màn hình
+    this.x = (width - this.width) / 2; // Căn giữa ngang
+    this.y = -this.height; // Bắt đầu từ trên cùng
     this.speed = globalSpeed;
     this.type = random() < 0.5 ? 'bad' : 'good'; // 50% bad, 50% good
     this.img = this.type === 'bad' ? npc2Img : npcImg;
@@ -156,7 +149,7 @@ class Obstacle {
   }
   
   show() {
-    image(this.img, this.x, this.y, this.size, this.size);
+    image(this.img, this.x, this.y, this.width, this.height);
   }
   
   offscreen() {
@@ -164,9 +157,11 @@ class Obstacle {
   }
   
   hits(player) {
-    let d = dist(this.x + this.size / 2, this.y + this.size / 2, 
-                 player.x + player.size / 2, player.y + player.size / 2);
-    return d < this.size / 2 + player.size / 2;
+    // Kiểm tra va chạm hình chữ nhật
+    return (player.x + player.size > this.x &&
+            player.x < this.x + this.width &&
+            player.y + player.size > this.y &&
+            player.y < this.y + this.height);
   }
 }
 
